@@ -9,11 +9,13 @@ rename-desktop-file: nudelta.desktop
 rename-icon: nudelta
 
 finish-args:
-  - --socket=fallback-x11
+  - --socket=x11
   - --socket=wayland
   - --share=network
   - --device=dri
   - --share=ipc
+  - --socket=system-bus
+  - --device=all
 
 modules:
   - name: nudelta
@@ -21,7 +23,11 @@ modules:
     build-commands:
       - chmod +x nudelta-amd64.AppImage
       - ./nudelta-amd64.AppImage --appimage-extract
-      - install -Dm755 squashfs-root/AppRun /app/bin/AppRun
+      - cp -r squashfs-root/* /app/bin/
+      - cp squashfs-root/nudelta /app/bin/nudelta
+      - mv ${FLATPAK_DEST}/bin/nudelta ${FLATPAK_DEST}/bin/nudelta.bin
+      - install -Dm755 nudelta.sh ${FLATPAK_DEST}/bin/nudelta
+      - install -Dm755 squashfs-root/AppRun ${FLATPAK_DEST}/bin/AppRun
       - install -Dm644 squashfs-root/nudelta.desktop /app/share/applications/nudelta.desktop
       - install -Dm644 squashfs-root/usr/share/icons/hicolor/256x256/apps/nudelta.png -t /app/share/icons/hicolor/256x256/apps
 
@@ -29,3 +35,7 @@ modules:
       - type: file
         url: https://github.com/donn/nudelta/releases/download/0.7.4/nudelta-amd64.AppImage
         sha256: 922e661425f948851102a484e8a0096b258198fe6c784cb36cf1afff99a2198c
+      - type: script
+        dest-filename: nudelta.sh
+        commands:
+          - exec env TMPDIR=$XDG_CACHE_HOME zypak-wrapper /app/bin/nudelta.bin -s $EXTRA_ARGS \"$@\"
