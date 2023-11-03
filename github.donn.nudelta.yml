@@ -29,7 +29,8 @@ modules:
       - install -Dm755 nudelta.sh ${FLATPAK_DEST}/bin/nudelta
       - install -Dm755 squashfs-root/AppRun ${FLATPAK_DEST}/bin/AppRun
       - install -Dm644 squashfs-root/nudelta.desktop /app/share/applications/nudelta.desktop
-      - install -Dm644 squashfs-root/usr/share/icons/hicolor/256x256/apps/nudelta.png -t /app/share/icons/hicolor/256x256/apps
+      - cp -r squashfs-root/usr/share -t /app/
+      - rm -r /app/share/icons/hicolor/1024x1024
 
     sources:
       - type: file
